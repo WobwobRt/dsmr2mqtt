@@ -1,0 +1,15 @@
+[Unit]
+Description=DSMR P1 to MQTT parser
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /opt/dsmr2mqtt/dsmr2mqtt.py
+WorkingDirectory=/opt/dsmr2mqtt
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=3
+User=dsmr2mqtt
+
+[Install]
+WantedBy=multi-user.target
