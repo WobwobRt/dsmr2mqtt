@@ -1,0 +1,9 @@
+services:
+  dsmr2mqtt:
+    hostname: dsmr2mqtt
+    container_name: dsmr2mqtt
+    image: wobwobrt/dsmr2mqtt
+    devices:
+      - /dev/serial/by-id/usb-FTDI_FT232R:/dev/ttyDSMR # <-- EDIT
+    volumes:
+      - ./config.yaml:/opt/dsmr2mqtt/config.yaml
