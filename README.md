@@ -16,6 +16,7 @@ Docker install:
 1. Download docker-compose.yml to your favorite directory
 2. Download config.yaml to that same directory
 3. Edit config.yaml
-4. (sudo) docker compose pull
-5. (sudo) docker compose up -d
-6. Victory!
+4. Edit docker-compose.yml (change path to your serial device)
+5. (sudo) docker compose pull
+6. (sudo) docker compose up -d
+7. Victory!
