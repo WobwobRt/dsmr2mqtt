@@ -1,0 +1,15 @@
+asn1crypto==1.5.1
+attrs==26.1.0
+cffi==2.1.1
+cryptography==50.0.1
+dlms-cosem==21.3.2
+dsmr-parser==1.11.2
+paho-mqtt==2.1.0
+pycparser==3.0
+pyserial==3.5
+pyserial-asyncio-fast==0.16
+python-dateutil==2.9.0
+pytz==2026.3
+six==1.17.0
+tailer==0.4.1
+typing_extensions==4.16.0

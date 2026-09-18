@@ -1,0 +1,97 @@
+# Copyright (c) 2024, Antonie Blom
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+import logging
+import time
+from threading import Thread, Condition
+
+
+class DirectPublisher:
+    def __init__(self, schema, client):
+        self.schema = schema
+        self.client = client
+
+    def publish(self, telegram):
+        self.schema.publish(self.client, telegram)
+
+
+class RateLimitedPublisher:
+    def __init__(self, schema, client, interval):
+        self.schema = schema
+        self.client = client
+        self.interval_ns = interval * 1000000000
+        self.telegram = None
+        self.msg = Condition()
+        self.tick = Condition()
+        self.started = Condition()
+        self.rate_ok = True
+
+        # Make sure we return an object with a consistent state. msg and
+        # tick conditions must be in locked or waiting state before
+        # we start receiving messages
+        with self.started:
+            Thread(target=self.ticker, daemon=True).start()
+            self.started.wait()
+            Thread(target=self.loop, daemon=True).start()
+            self.started.wait()
+
+    def ticker(self):
+        with self.tick:
+            with self.started:
+                self.started.notify()
+            next_ts = time.monotonic_ns()
+            while True:
+                try:
+                    self.tick.wait()
+                    sleep_ns = next_ts - time.monotonic_ns()
+                    if sleep_ns > 0:
+                        logging.debug(f'Rate limiter delay: {sleep_ns} ns')
+                        time.sleep(sleep_ns / 1000000000)
+                    else:
+                        logging.debug('No rate limiter delay')
+                    with self.msg:
+                        self.rate_ok = True
+                        self.msg.notify()
+                    next_ts += self.interval_ns
+                except Exception:
+                    logging.exception('Rate limiter ticker thread crashed')
+                    raise SystemExit(1)  # or os._exit(1) — see note below
+
+    def loop(self):
+        with self.msg:
+            with self.started:
+                self.started.notify()
+            while True:
+                try:
+                    self.msg.wait()
+                    if not self.rate_ok:
+                        logging.debug('Got message, but not ready to publish yet')
+                        continue
+                    if self.telegram is not None:
+                        logging.debug('Ready to publish message')
+                        self.schema.publish(self.client, self.telegram)
+                        self.telegram = None
+                        with self.tick:
+                            self.rate_ok = False
+                            self.tick.notify()
+                    else:
+                        logging.debug('Ready to publish, but no message queued')
+                except Exception:
+                    logging.exception('Publisher thread crashed')
+                    os._exit(1)
+
+    def publish(self, telegram):
+        with self.msg:
+            self.telegram = telegram
+            self.msg.notify()
