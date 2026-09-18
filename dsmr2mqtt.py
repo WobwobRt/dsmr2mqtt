@@ -30,11 +30,11 @@ def on_connect(client, userdata, flags, rc, properties):
         logging.info('Connected to broker')
         client.publish(avail, 'online', retain=True)
     else:
-        logging.error(f,'Broker connection failed: {rc}')
+        logging.error(f'Broker connection failed: {rc}')
 
 
 def on_disconnect(client, userdata, disconnect_flags, rc, properties):
-    logging.error(f,'Disconnected from broker: {rc}')
+    logging.error(f'Disconnected from broker: {rc}')
 
 
 def on_sigterm(signo, frame):
