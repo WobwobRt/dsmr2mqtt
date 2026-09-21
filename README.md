@@ -39,19 +39,7 @@ services:
 Use additional environment variables as required, per the documentation
 below.
 
-Run `docker compose up -d` to start the application. There are multiple
-ways to enable docker compose at system start-up. One method is to place
-the above configuration in `/etc/docker/compose/mqtt4dsmr/docker-compose.yml`,
-and follow [this guide](https://gist.github.com/mosquito/b23e1c1e5723a7fd9e6568e5cf91180f/18a4efee062cda1a5b6807e440f891fd6bfb4f78).
-Running `systemctl enable --now docker-compose@mqtt4dsmr` should then
-do the trick.
-
-Use additional environment variables as required, per the documentation
-below.
-
-Enable the container using `systemctl --user start mqtt4dsmr`. To
-automatically start the daemon at system start-up while using rootless
-containers, enable lingering for your user: `loginctl enable-linger <my-user>`.
+Run `docker compose up -d` to start the application.
 
 ## Options
 Options must be given to the container as environment variables.
