@@ -10,6 +10,6 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
 RUN rm requirements.txt
 
 COPY *.py .
-ARG VERSION_TAG=0.3
+ARG VERSION_TAG=0.4
 ENV DSMR2MQTT_VERSION=$VERSION_TAG
 CMD [ "env", "SERIAL_DEVICE=/dev/ttyDSMR", "./dsmr2mqtt.py" ]
