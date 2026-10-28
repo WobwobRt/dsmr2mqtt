@@ -1,4 +1,4 @@
-FROM python:3.14-alpine
+FROM python:3.15-alpine
 WORKDIR /opt/dsmr2mqtt
 COPY requirements.txt requirements.txt
 # RUN pip install --root-user-action ignore --no-cache-dir -r requirements.txt
