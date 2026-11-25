@@ -10,7 +10,7 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
 RUN rm requirements.txt
 
 COPY *.py .
-ARG VERSION_TAG=0.4
+ARG VERSION_TAG=0.5
 ENV DSMR2MQTT_VERSION=$VERSION_TAG
 HEALTHCHECK --interval=10s --start-period=5s --retries=3 \
   CMD pgrep -f python > /dev/null || exit 1
