@@ -12,4 +12,6 @@ RUN rm requirements.txt
 COPY *.py .
 ARG VERSION_TAG=0.4
 ENV DSMR2MQTT_VERSION=$VERSION_TAG
+HEALTHCHECK --interval=10s --start-period=5s --retries=3 \
+  CMD pgrep -f python > /dev/null || exit 1
 CMD [ "env", "SERIAL_DEVICE=/dev/ttyDSMR", "./dsmr2mqtt.py" ]
